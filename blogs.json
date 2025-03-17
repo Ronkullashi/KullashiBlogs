@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "title": "My First Blog Post",
+        "date": "2024-03-17T12:00:00",
+        "content": "This is my first blog post. I'm excited to share my thoughts!"
+    },
+    {
+        "id": 2,
+        "title": "Second Blog - Exciting Updates!",
+        "date": "2024-03-18T15:30:00",
+        "content": "I've made some updates to my blog. Stay tuned for more!"
+    }
+]
