@@ -14,12 +14,18 @@
 </head>
 <style>
     body {
-        background-color: #FDFBF3; /* Matches requested background color */
+        background-color: #FDFBF3;
         font-family: system-ui, -apple-system, sans-serif;
         margin: 20px;
     }
 
-    /* New Blog Button */
+    .top-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
     .new-blog-btn {
         padding: 10px 15px;
         font-size: 16px;
@@ -46,7 +52,6 @@
         border-radius: 5px;
     }
 
-    /* Blog Title - Now Italicized */
     .blog-title {
         text-decoration: none;
         color: black;
@@ -56,7 +61,6 @@
         margin-right: 15px;
     }
 
-    /* Delete Button */
     .delete-btn {
         background: black;
         color: white;
@@ -66,12 +70,27 @@
         cursor: pointer;
         border-radius: 5px;
     }
+
+    /* Timer Display */
+    .timer-container {
+        font-size: 18px;
+        font-style: italic;
+        text-decoration: underline;
+    }
 </style>
 </head>
 <body>
 
 <h1>My Blog</h1>
-<button class="new-blog-btn" onclick="addNewBlog()">New Blog</button>
+
+<!-- Timer and New Blog Button in the Same Line -->
+<div class="top-container">
+    <button class="new-blog-btn" onclick="addNewBlog()">New Blog</button>
+    <div class="timer-container">
+        Time since last blog: <span id="timer">Loading...</span>
+    </div>
+</div>
+
 <ul id="blogList"></ul>
 
 <script>
@@ -82,7 +101,7 @@
         let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
         let blogId = new Date().getTime(); // Unique ID based on timestamp
 
-        blogs.push({ id: blogId, title: blogTitle }); // Store title as entered, no "Blog -"
+        blogs.push({ id: blogId, title: blogTitle, date: blogId }); // Store timestamp
         localStorage.setItem("blogs", JSON.stringify(blogs));
         displayBlogs();
     }
@@ -103,13 +122,15 @@
         let blogList = document.getElementById("blogList");
         blogList.innerHTML = "";
 
+        blogs.sort((a, b) => b.date - a.date); // Sort by most recent first
+
         blogs.forEach(blog => {
             let li = document.createElement("li");
 
             let a = document.createElement("a");
             a.href = `blog.html?id=${blog.id}`;
-            a.textContent = blog.title; // Now displays the title correctly
-            a.classList.add("blog-title"); // Italicized
+            a.textContent = blog.title;
+            a.classList.add("blog-title");
 
             let deleteBtn = document.createElement("button");
             deleteBtn.textContent = "Delete";
@@ -122,12 +143,40 @@
             li.appendChild(deleteBtn);
             blogList.appendChild(li);
         });
+
+        updateTimer();
+    }
+
+    function updateTimer() {
+        let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+        if (blogs.length === 0) {
+            document.getElementById("timer").textContent = "No blogs yet.";
+            return;
+        }
+
+        let latestBlog = blogs.sort((a, b) => b.date - a.date)[0]; // Get most recent blog
+        let lastBlogTime = latestBlog.date;
+        let timerElement = document.getElementById("timer");
+
+        function updateTime() {
+            let now = new Date().getTime();
+            let elapsed = now - lastBlogTime;
+
+            let seconds = Math.floor((elapsed / 1000) % 60);
+            let minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+            let hours = Math.floor((elapsed / (1000 * 60 * 60)) % 24);
+            let days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+
+            timerElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000); // Update every second
     }
 
     document.addEventListener("DOMContentLoaded", displayBlogs);
 </script>
 
 </body>
-</html>
 
 </html> 
